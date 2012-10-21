@@ -4,12 +4,16 @@ class MoviesController < ApplicationController
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
     # will render app/views/movies/show.<extension> by default
-
-    @saved_sort = session[:sort]
-    @saved_ratings = session[:ratings]
   end
 
   def index
+    if params[:ratings].nil? and params[:sort].nil?
+        @saved_sort = session[:sort]
+        @saved_ratings = session[:ratings]
+
+        redirect_to movies_path(:sort => @saved_sort, :ratings => @saved_ratings)
+    end
+
     if params[:ratings].nil?
         params[:ratings] = Hash[*Movie.get_ratings(nil).select { |r| r[:checked] }.map { |r| [ r[:rating], '1' ] }.flatten ]
     end
