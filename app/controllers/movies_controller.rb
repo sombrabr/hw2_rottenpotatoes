@@ -7,8 +7,18 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all(:order => params[:sort])
+    if params[:ratings].nil?
+        keys = Movie.get_ratings(nil).map do |r|
+            r[:rating]
+        end
+    else
+        keys = params[:ratings].keys
+    end
+
+    @movies = Movie.all(:order => params[:sort], :conditions => { :rating => keys })
     instance_variable_set("@#{params[:sort]}_hilite", 'hilite')
+
+    @all_ratings = Movie.get_ratings(keys)
   end
 
   def new
